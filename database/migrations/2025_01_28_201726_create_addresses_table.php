@@ -17,8 +17,12 @@ return new class extends Migration
             $table->foreign('city_id')
                 ->references('id')
                 ->on('cities');
-            $table->foreignId('user_id')->nullable()->constrained('users');
+            $table->unsignedMediumInteger('state_id')->nullable();
+            $table->foreign('state_id')
+                ->references('id')
+                ->on('states');
             $table->foreignId('event_id')->nullable()->constrained('events');
+            $table->foreignId('user_id')->nullable()->constrained('users');
             $table->string('zipcode')->nullable();
             $table->string('address')->nullable();
             $table->string('number')->nullable();

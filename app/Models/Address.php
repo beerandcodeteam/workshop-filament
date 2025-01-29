@@ -14,6 +14,7 @@ class Address extends Model
         'city_id',
         'user_id',
         'event_id',
+        'state_id',
         'zipcode',
         'address',
         'number',
@@ -28,6 +29,11 @@ class Address extends Model
     public function city(): BelongsTo
     {
         return$this->belongsTo(City::class);
+    }
+
+    public function state(): BelongsTo
+    {
+        return$this->belongsTo(State::class);
     }
 
     public function user(): BelongsTo
