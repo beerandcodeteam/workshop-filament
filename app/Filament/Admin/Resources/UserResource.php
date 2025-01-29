@@ -8,8 +8,10 @@ use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -33,18 +35,43 @@ class UserResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nome'),
+                    ->label('Nome')
+                    ->searchable(),
                 TextColumn::make('email')
-                    ->label('Email'),
+                    ->label('Email')
+                    ->searchable(),
+                TextColumn::make('addresses.city.state.country.name')
+                    ->label('País')
+                    ->searchable(),
                 TextColumn::make('events_count')
-                    ->label('Eventos')
+                    ->label('Eventos que participou')
+                    ->badge()
+                    ->color(function (string $state) {
+                       if ($state < 5) {
+                           return 'gray';
+                       }
+                       return 'success';
+                    })
                     ->counts([
-                    'events' => fn (Builder $query): Builder => $query->whereNotNull('event_user.checkin_at')
-                ]),
+                        'events' => fn (Builder $query): Builder => $query->whereNotNull('event_user.checkin_at')
+                    ]),
+                TextColumn::make('created_at')
+                    ->date("d F Y"),
+                Tables\Columns\ViewColumn::make('teste')->view('filament.tables.columns.custom-column')
             ])
             ->filters([
-                //
+                SelectFilter::make('role_id')
+                    ->label("Tipo")
+                    ->relationship('role', 'name'),
+                Tables\Filters\QueryBuilder::make()
+                    ->constraints([
+                        Tables\Filters\QueryBuilder\Constraints\DateConstraint::make('created_at')
+                            ->label('Data de criação'),
+                        Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint::make('events')
+                            ->relationship('events', 'name')->multiple()
+                    ])
             ])
+            ->filtersFormWidth(MaxWidth::FourExtraLarge)
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
