@@ -25,6 +25,11 @@ class Address extends Model
         'deleted_at',
     ];
 
+    public function city(): BelongsTo
+    {
+        return$this->belongsTo(City::class);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
