@@ -17,8 +17,9 @@ return new class extends Migration
             $table->foreign('city_id')
                 ->references('id')
                 ->on('cities');
-            $table->foreignId('user_id')->nullable()->constrained('users');
             $table->foreignId('event_id')->nullable()->constrained('events');
+            $table->foreignId('state_id')->nullable()->constrained('states');
+            $table->foreignId('user_id')->nullable()->constrained('users');
             $table->string('zipcode')->nullable();
             $table->string('address')->nullable();
             $table->string('number')->nullable();
