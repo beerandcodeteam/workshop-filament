@@ -26,7 +26,8 @@ class Event extends Model
 
     public function attractions(): BelongsToMany
     {
-        return $this->belongsToMany(Attraction::class);
+        return $this->belongsToMany(Attraction::class)
+            ->withPivot('schedule');
     }
 
     public function eventType(): BelongsTo
@@ -46,6 +47,7 @@ class Event extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)
+            ->withPivot('checkin_at');
     }
 }
