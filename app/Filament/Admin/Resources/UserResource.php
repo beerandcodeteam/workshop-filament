@@ -4,9 +4,13 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\UserResource\Pages;
 use App\Filament\Admin\Resources\UserResource\RelationManagers;
+use App\Filament\BlockGroups\Address;
+use App\Models\Role;
 use App\Models\User;
+use App\Services\AddressServices;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
@@ -15,18 +19,82 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Validation\Rules\Password;
+use Filament\Forms\Components\Actions\Action;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Usuários';
+    protected static ?string $pluralLabel = 'Usuários';
+    protected static ?string $label = 'Usuário';
+
+    protected static ?int $navigationSort = 1;
+
+    protected static ?string $navigationIcon = 'heroicon-o-home-modern';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Section::make([
+                    Forms\Components\Fieldset::make('Papel')
+                        ->schema([
+                            Forms\Components\ToggleButtons::make('role_id')
+                                ->label('')
+                                ->required()
+                                ->markAsRequired(false)
+                                ->options(Role::all()->sortBy('name')->pluck('name', 'id'))
+                                ->grouped()
+                                ->reactive()
+                                ->default(2)
+                                ->afterStateUpdated(function ($record, $state, $livewire)
+                                {
+                                    if ($record)
+                                    {
+                                        $record->role_id = (int) $state;
+                                        $livewire->dispatch('type-updated');
+                                    }
+                                }),
+                        ]),
+                    Forms\Components\Fieldset::make('Dados de acesso')
+                        ->schema([
+                            Forms\Components\TextInput::make('name')
+                                ->label('Nome')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('email')
+                                ->label('Email')
+                                ->required()
+                                ->maxLength(255)
+                                ->unique(ignoreRecord: true),
+                            Forms\Components\TextInput::make('password')
+                                ->label('Senha')
+                                ->required()
+                                ->maxLength(255)
+                                ->confirmed()
+                                ->rules([Password::min(8)->mixedCase()->numbers()->uncompromised()])
+                                ->password()
+                                ->revealable(),
+                            Forms\Components\TextInput::make('password_confirmation')
+                                ->label('Confirme a Senha')
+                                ->required()
+                                ->maxLength(255)
+                                ->password()
+                                ->revealable(),
+                        ]),
+                    Forms\Components\Fieldset::make('Dados de Endereço')
+                        ->schema([
+                            Forms\Components\Repeater::make('addresses')
+                                ->hiddenLabel()
+                                ->relationship()
+                                ->schema(Address::make($form))
+                                ->columns(2)
+                                ->addActionLabel('Adicionar Endereço')
+                                ->addActionAlignment('start')
+                        ])->columns(1)
+                ])
             ]);
     }
 
