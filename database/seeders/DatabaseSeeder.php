@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             AttractionTypeSeeder::class,
             EventTypeSeeder::class,
-            EventStatusSeeder::class
+            EventStatusSeeder::class,
+            UserSeeder::class,
         ]);
 
         User::factory()->create([
