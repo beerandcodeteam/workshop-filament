@@ -1,0 +1,15 @@
+@import '/vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+.fi-topbar nav {
+    @apply bg-indigo-600 text-white py-4;
+}
+
+.fi-topbar-item-button {
+    @apply bg-indigo-600;
+}
+
+.fi-topbar-item-button:hover {
+    @apply bg-indigo-700;
+}
